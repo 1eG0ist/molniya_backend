@@ -1,0 +1,29 @@
+jwt:
+  secret: 2383n45394mcubdfisdASDHJLGSdfiksn98378nsmhjd
+  lifetime: 30m
+  refresh_lifetime: 30d
+
+spring:
+  application:
+    name: molniya_backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5455/molniya_db
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  docker:
+    compose:
+      enabled: false

@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:14
+    container_name: molniya-db-dev
+    restart: always
+    environment:
+      POSTGRES_DB: molniya_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5455:5432"
+    volumes:
+      - ${DB_DATA_PATH:-~/molniya_db}:/var/lib/postgresql/data
