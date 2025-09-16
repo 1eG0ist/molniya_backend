@@ -15,7 +15,7 @@ services:
       - ${DB_DATA_PATH:-/var/lib/molniya_db}:/var/lib/postgresql/data
 
   app:
-    build: .
+    image: sevai/molniya_backend:latest
     container_name: molniya-backend
     restart: always
     depends_on:

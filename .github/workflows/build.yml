@@ -1,0 +1,96 @@
+name: MolniyaBuild
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+
+  push:
+    branches:
+      - 'main'
+
+env:
+  DB_HOST: localhost
+  DB_USERNAME: postgres
+  DB_PASSWORD: admin
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: molniya_db
+          POSTGRES_PASSWORD: admin
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test --info
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/molniya_backend:latest .
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/molniya_backend:latest
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+      - name: install ssh keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          mkdir ~/.ssh
+          echo "${{ secrets.SSH_VPS }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+      - name: Deploy to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << 'EOF' 
+            set -e  # Exit on error
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+            # Создаем папку если не существует
+            mkdir -p /home/seva/molniya_backend
+            cd /home/seva/molniya_backend
+
+            # Останавливаем текущие контейнеры если есть
+            docker-compose -f docker-compose.prod.yaml down || true
+          EOF
+
+          # Копируем docker-compose.prod.yaml на сервер
+          scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} \
+            docker-compose.prod.yaml \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/seva/molniya_backend/
+
+          # Запускаем контейнеры
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << 'EOF' 
+            cd /home/seva/molniya_backend
+            docker-compose -f docker-compose.prod.yaml up -d --pull always
+          EOF
+      - name: cleanup
+        run: |
+          rm -f ~/.ssh/id_rsa
+          rm -f ~/.ssh/known_hosts
