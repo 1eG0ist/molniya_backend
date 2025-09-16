@@ -3,8 +3,8 @@ FROM gradle:8.5-alpine as build
 
 # Copy the source code and build files
 COPY src src
-COPY build.gradle build.gradle
-COPY settings.gradle settings.gradle
+COPY build.gradle.kts build.gradle.kts
+COPY settings.gradle.kts settings.gradle.kts
 
 # Copy all necessary files
 COPY . .
