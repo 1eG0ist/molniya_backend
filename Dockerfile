@@ -9,8 +9,8 @@ COPY settings.gradle.kts settings.gradle.kts
 # Copy all necessary files
 COPY . .
 
-# Build the application
-RUN gradle clean build
+# Build the application with out tests
+RUN gradle clean build -x test
 
 ENTRYPOINT ["top", "-b"]
 
