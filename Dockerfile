@@ -27,7 +27,7 @@ WORKDIR /app
 RUN chown -R molniyauser:molniyauser /app
 
 # Copy the built JAR file from the build stage
-COPY --from=build /home/gradle/build/libs/sportgram_backend-0.0.1-SNAPSHOT.jar ./application.jar
+COPY --from=build /home/gradle/build/libs/molniya_backend-0.0.1-SNAPSHOT.jar ./application.jar
 
 # Copy the init.sh script
 COPY init.sh ./init.sh
