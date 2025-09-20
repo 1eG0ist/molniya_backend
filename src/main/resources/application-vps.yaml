@@ -1,5 +1,4 @@
 spring:
-  profiles: vps
   config:
     activate:
       on-profile: vps
