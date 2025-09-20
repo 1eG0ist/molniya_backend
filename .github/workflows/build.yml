@@ -77,7 +77,9 @@ jobs:
             cd /home/seva/molniya_backend
 
             # Останавливаем текущие контейнеры если есть
-            docker-compose -f docker-compose.prod.yaml down || true
+            if [ -f docker-compose.prod.yaml ]; then
+              docker-compose -f docker-compose.prod.yaml down --remove-orphans || true
+            fi
           EOF
 
           # Копируем docker-compose.prod.yaml на сервер
