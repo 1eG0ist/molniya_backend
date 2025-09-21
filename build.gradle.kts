@@ -55,9 +55,9 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
 
     // --- OpenTelemetry for tracing ---
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.45.0")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter:2.3.0")
-
+//    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.45.0")
+//    implementation("io.micrometer:micrometer-tracing")
+//    implementation("io.micrometer:micrometer-tracing-bridge-otel")
 }
 
 tasks.withType<Test> {
