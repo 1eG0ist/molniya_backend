@@ -93,7 +93,7 @@ CREATE TABLE player_distances (
         id          BIGSERIAL PRIMARY KEY,
         user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         distance    REAL NOT NULL, -- meters
-        time        INTERVAL NOT NULL,
+        time        REAL NOT NULL,
         measured_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 

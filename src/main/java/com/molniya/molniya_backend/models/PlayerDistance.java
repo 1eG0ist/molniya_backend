@@ -3,7 +3,6 @@ package com.molniya.molniya_backend.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.Duration;
 import java.time.OffsetDateTime;
 
 @Data
@@ -22,7 +21,7 @@ public class PlayerDistance {
     private Float distance;
 
     @Column(nullable = false)
-    private Duration time;
+    private Float time;
 
     private OffsetDateTime measuredAt = OffsetDateTime.now();
 }
