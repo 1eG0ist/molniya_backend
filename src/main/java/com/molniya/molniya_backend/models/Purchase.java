@@ -25,7 +25,7 @@ public class Purchase {
     private Integer quantity;
 
     @Column(nullable = false)
-    private Integer totalPrice;
+    private Float totalPrice;
 
     private OffsetDateTime purchasedAt;
 }

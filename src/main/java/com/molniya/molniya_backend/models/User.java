@@ -34,7 +34,7 @@ public class User {
     private String photoUrl;
 
     @Column(nullable = false)
-    private Integer coins = 0;
+    private Float coins = 0.0f;
 
     private OffsetDateTime createdAt = OffsetDateTime.now();
 

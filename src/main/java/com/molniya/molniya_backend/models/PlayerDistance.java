@@ -3,7 +3,6 @@ package com.molniya.molniya_backend.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 
@@ -20,7 +19,7 @@ public class PlayerDistance {
     private User user;
 
     @Column(nullable = false)
-    private BigDecimal distance;
+    private Float distance;
 
     @Column(nullable = false)
     private Duration time;

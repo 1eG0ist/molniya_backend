@@ -19,11 +19,11 @@ public class Product {
     private String description;
 
     @Column(nullable = false)
-    private Integer price;
+    private Float price;
 
     private Integer stock = 0;
 
-    private String filePath;
+    private String imagePath;
 
     private OffsetDateTime createdAt;
 }

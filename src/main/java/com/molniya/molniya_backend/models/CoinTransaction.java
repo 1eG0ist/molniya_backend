@@ -18,7 +18,7 @@ public class CoinTransaction {
     private User user;
 
     @Column(nullable = false)
-    private Integer amount;
+    private Float amount;
 
     private String description;
 

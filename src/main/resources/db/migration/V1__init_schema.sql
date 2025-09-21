@@ -21,7 +21,7 @@ CREATE TABLE users (
         full_name   VARCHAR(255),
         birthday    DATE,
         photo_url   TEXT,
-        coins       INT DEFAULT 0 CHECK (coins >= 0),
+        coins       REAL DEFAULT 0 CHECK (coins >= 0),
         created_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
         updated_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
@@ -47,7 +47,7 @@ CREATE TABLE user_sensitive_data (
 CREATE TABLE coin_transactions (
         id              BIGSERIAL PRIMARY KEY,
         user_id         BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        amount          INT NOT NULL,
+        amount          REAL NOT NULL,
         description     VARCHAR(255),
         created_by_id   BIGINT REFERENCES users(id), -- кто начислил/списал
         created_at      TIMESTAMP WITH TIME ZONE DEFAULT now()
@@ -92,7 +92,7 @@ CREATE TABLE player_stats (
 CREATE TABLE player_distances (
         id          BIGSERIAL PRIMARY KEY,
         user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        distance    NUMERIC(6,2) NOT NULL, -- км
+        distance    REAL NOT NULL, -- meters
         time        INTERVAL NOT NULL,
         measured_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
@@ -231,9 +231,9 @@ CREATE TABLE products (
         id          BIGSERIAL PRIMARY KEY,
         name        VARCHAR(255) NOT NULL,
         description TEXT,
-        price       INT NOT NULL CHECK (price >= 0),
+        price       REAL NOT NULL CHECK (price >= 0),
         stock       INT DEFAULT 0 CHECK (stock >= 0),
-        file_path   TEXT,
+        image_path   TEXT,
         created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
@@ -245,6 +245,6 @@ CREATE TABLE purchases (
         user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         product_id   BIGINT NOT NULL REFERENCES products(id),
         quantity     INT NOT NULL CHECK (quantity > 0),
-        total_price  INT NOT NULL CHECK (total_price >= 0),
+        total_price  REAL NOT NULL CHECK (total_price >= 0),
         purchased_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
