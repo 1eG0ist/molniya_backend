@@ -43,6 +43,7 @@ services:
     image: prom/prometheus:latest
     container_name: molniya-prometheus
     restart: always
+    user: "0:0"   # root, for access to /prometheus
     volumes:
       - ./metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ${METRICS_PATH}/prometheus/data:/prometheus
@@ -58,6 +59,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    user: "472:472" # standard uid/gid grafana inside container
     volumes:
       - ${METRICS_PATH}/grafana:/var/lib/grafana
     ports:
