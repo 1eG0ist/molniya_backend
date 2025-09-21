@@ -49,6 +49,15 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // --- Monitoring & Observability ---
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
+    // --- OpenTelemetry for tracing ---
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.45.0")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter:2.3.0")
+
 }
 
 tasks.withType<Test> {

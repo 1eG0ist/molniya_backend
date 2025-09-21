@@ -19,12 +19,17 @@ CREATE TABLE users (
         id          BIGSERIAL PRIMARY KEY,
         username    VARCHAR(100) UNIQUE NOT NULL,
         full_name   VARCHAR(255),
-        role_id     BIGINT NOT NULL REFERENCES roles(id),
         birthday    DATE,
         photo_url   TEXT,
         coins       INT DEFAULT 0 CHECK (coins >= 0),
-        created_at  TIMESTAMP DEFAULT now(),
-        updated_at  TIMESTAMP DEFAULT now()
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        updated_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE user_roles (
+        id          BIGSERIAL PRIMARY KEY,
+        user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        role_id     BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE
 );
 
 -- =========================
@@ -45,7 +50,7 @@ CREATE TABLE coin_transactions (
         amount          INT NOT NULL,
         description     VARCHAR(255),
         created_by_id   BIGINT REFERENCES users(id), -- кто начислил/списал
-        created_at      TIMESTAMP DEFAULT now()
+        created_at      TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -78,9 +83,7 @@ CREATE TABLE player_stats (
         goals       INT DEFAULT 0,
         assists     INT DEFAULT 0,
         dribbles    INT DEFAULT 0,
-        distance    NUMERIC(6,2), -- км
-        max_speed   NUMERIC(5,2), -- км/ч
-        created_at  TIMESTAMP DEFAULT now()
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -91,7 +94,7 @@ CREATE TABLE player_distances (
         user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         distance    NUMERIC(6,2) NOT NULL, -- км
         time        INTERVAL NOT NULL,
-        measured_at TIMESTAMP DEFAULT now()
+        measured_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -109,10 +112,10 @@ CREATE TABLE locations (
 CREATE TABLE trainings (
         id          BIGSERIAL PRIMARY KEY,
         title       VARCHAR(255) NOT NULL,
-        start_time  TIMESTAMP NOT NULL,
-        end_time    TIMESTAMP,
+        start_time  TIMESTAMP WITH TIME ZONE NOT NULL,
+        end_time    TIMESTAMP WITH TIME ZONE,
         location_id BIGINT REFERENCES locations(id),
-        created_at  TIMESTAMP DEFAULT now()
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -125,7 +128,8 @@ CREATE TABLE player_evaluations (
         training_id BIGINT REFERENCES trainings(id),
         score       INT NOT NULL CHECK (score BETWEEN 1 AND 100),
         note        TEXT,
-        created_at  TIMESTAMP DEFAULT now(),
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        updated_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
         UNIQUE (player_id, trainer_id, training_id) -- один тренер — одна оценка на тренировку
 );
 
@@ -137,7 +141,8 @@ CREATE TABLE player_notes (
         player_id   BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
         training_id BIGINT REFERENCES trainings(id), -- опционально
         note        TEXT NOT NULL,
-        created_at  TIMESTAMP DEFAULT now()
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        updated_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -146,7 +151,7 @@ CREATE TABLE player_notes (
 CREATE TABLE teams (
         id          BIGSERIAL PRIMARY KEY,
         name        VARCHAR(255) NOT NULL,
-        created_at  TIMESTAMP DEFAULT now()
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -156,7 +161,7 @@ CREATE TABLE players_teams (
         id          BIGSERIAL PRIMARY KEY,
         player_id   BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
         team_id     BIGINT NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
-        joined_at   TIMESTAMP DEFAULT now(),
+        joined_at   TIMESTAMP WITH TIME ZONE DEFAULT now(),
         UNIQUE (player_id, team_id)
 );
 
@@ -167,7 +172,7 @@ CREATE TABLE tournaments (
         id          BIGSERIAL PRIMARY KEY,
         name        VARCHAR(255) NOT NULL,
         season_id   BIGINT REFERENCES seasons(id) ON DELETE SET NULL,
-        created_at  TIMESTAMP DEFAULT now()
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -177,7 +182,7 @@ CREATE TABLE matches (
         id            BIGSERIAL PRIMARY KEY,
         home_team_id  BIGINT REFERENCES teams(id) ON DELETE SET NULL,
         away_team_id  BIGINT REFERENCES teams(id) ON DELETE SET NULL,
-        match_date    TIMESTAMP NOT NULL,
+        match_date    TIMESTAMP WITH TIME ZONE NOT NULL,
         score_home    INT,
         score_away    INT,
         tournament_id BIGINT REFERENCES tournaments(id) ON DELETE SET NULL
@@ -204,8 +209,8 @@ CREATE TABLE reminders (
         id          BIGSERIAL PRIMARY KEY,
         user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         message     VARCHAR(255) NOT NULL,
-        remind_at   TIMESTAMP NOT NULL,
-        created_at  TIMESTAMP DEFAULT now()
+        remind_at   TIMESTAMP WITH TIME ZONE NOT NULL,
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -229,7 +234,7 @@ CREATE TABLE products (
         price       INT NOT NULL CHECK (price >= 0),
         stock       INT DEFAULT 0 CHECK (stock >= 0),
         file_path   TEXT,
-        created_at  TIMESTAMP DEFAULT now()
+        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -241,5 +246,5 @@ CREATE TABLE purchases (
         product_id   BIGINT NOT NULL REFERENCES products(id),
         quantity     INT NOT NULL CHECK (quantity > 0),
         total_price  INT NOT NULL CHECK (total_price >= 0),
-        purchased_at TIMESTAMP DEFAULT now()
+        purchased_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

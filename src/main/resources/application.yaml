@@ -27,3 +27,13 @@ spring:
   docker:
     compose:
       enabled: false
+
+# локально не нужны метрики, трейсинг и пр.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health   # только health-check
+  endpoint:
+    health:
+      show-details: never # не палим детали локально

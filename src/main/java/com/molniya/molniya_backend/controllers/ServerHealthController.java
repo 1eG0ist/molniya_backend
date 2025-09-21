@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/health")
+@RequestMapping("/check")
 public class ServerHealthController {
 
     @GetMapping

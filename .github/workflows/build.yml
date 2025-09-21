@@ -87,8 +87,16 @@ jobs:
           scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} \
             docker-compose.prod.yaml \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/seva/molniya_backend/
+          
+          # Создаем папку для prometheus configs (если нет) и копируем только prometheus.yml
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} "mkdir -p /home/seva/molniya_backend/metrics/prometheus"
+          
+          scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} \
+            metrics/prometheus/prometheus.yml \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/seva/molniya_backend/metrics/prometheus/
+          
 
-          # Запускаем контейнеры
+  # Запускаем контейнеры
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << 'EOF' 
             cd /home/seva/molniya_backend
             docker-compose -f docker-compose.prod.yaml up -d --pull always
