@@ -96,7 +96,7 @@ jobs:
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/seva/molniya_backend/metrics/prometheus/
           
 
-  # Запускаем контейнеры
+          # Запускаем контейнеры
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << 'EOF' 
             cd /home/seva/molniya_backend
             docker-compose -f docker-compose.prod.yaml up -d --pull always
