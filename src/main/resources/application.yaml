@@ -3,6 +3,10 @@ jwt:
   lifetime: 30m
   refresh_lifetime: 30d
 
+server:
+  servlet:
+    context-path: "/api/v1" # change this on big updates on server side
+
 spring:
   application:
     name: molniya_backend

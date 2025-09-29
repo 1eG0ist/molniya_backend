@@ -24,7 +24,8 @@ public class PlayerStats {
 
     private Integer goals = 0;
     private Integer assists = 0;
-    private Integer dribbles = 0;
+    private Integer passes = 0;
+    private Integer sprints = 0;
 
     private OffsetDateTime createdAt = OffsetDateTime.now();
 }

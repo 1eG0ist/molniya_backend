@@ -15,14 +15,16 @@ public class Training {
     @Column(nullable = false)
     private String title;
 
+    private String description;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "trainer_id", nullable = false)
+    private User trainer;
+
     @Column(nullable = false)
     private OffsetDateTime startTime;
 
     private OffsetDateTime endTime;
-
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
 
     private OffsetDateTime createdAt = OffsetDateTime.now();
 }

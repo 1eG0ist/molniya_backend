@@ -1,4 +1,4 @@
-package com.molniya.molniya_backend.dtos;
+package com.molniya.molniya_backend.dtos.user;
 
 import lombok.Data;
 

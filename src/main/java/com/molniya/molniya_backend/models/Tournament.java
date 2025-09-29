@@ -20,5 +20,9 @@ public class Tournament {
     @JoinColumn(name = "season_id")
     private Season season;
 
+    private OffsetDateTime tournamentStartDate;
+
+    private OffsetDateTime tournamentEndDate;
+
     private OffsetDateTime createdAt;
 }

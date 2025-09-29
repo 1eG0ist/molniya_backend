@@ -3,13 +3,12 @@
 -- =========================
 CREATE TABLE roles (
         id          BIGSERIAL PRIMARY KEY,
-        name        VARCHAR(50) UNIQUE NOT NULL -- PLAYER, TRAINER, PARENT, ADMIN
+        name        VARCHAR(50) UNIQUE NOT NULL -- PLAYER, TRAINER, ADMIN
 );
 
 INSERT INTO roles (name) 
 VALUES ('PLAYER'), 
-       ('TRAINER'), 
-       ('PARENT'), 
+       ('TRAINER'),
        ('ADMIN');
 
 -- =========================
@@ -21,6 +20,8 @@ CREATE TABLE users (
         full_name   VARCHAR(255),
         birthday    DATE,
         photo_url   TEXT,
+        phone       VARCHAR(50) UNIQUE NOT NULL ,
+        email       VARCHAR(100) UNIQUE,
         coins       REAL DEFAULT 0 CHECK (coins >= 0),
         created_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
         updated_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
@@ -82,7 +83,8 @@ CREATE TABLE player_stats (
         season_id   BIGINT NOT NULL REFERENCES seasons(id) ON DELETE CASCADE,
         goals       INT DEFAULT 0,
         assists     INT DEFAULT 0,
-        dribbles    INT DEFAULT 0,
+        passes      INT DEFAULT 0,
+        sprints     INT DEFAULT 0,
         created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
@@ -98,24 +100,26 @@ CREATE TABLE player_distances (
 );
 
 -- =========================
--- Локации
--- =========================
-CREATE TABLE locations (
-        id          BIGSERIAL PRIMARY KEY,
-        name        VARCHAR(255) NOT NULL,
-        address     VARCHAR(255)
-);
-
--- =========================
 -- Тренировки
 -- =========================
 CREATE TABLE trainings (
         id          BIGSERIAL PRIMARY KEY,
         title       VARCHAR(255) NOT NULL,
+        description VARCHAR(511) NOT NULL,
+        trainer_id  BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         start_time  TIMESTAMP WITH TIME ZONE NOT NULL,
         end_time    TIMESTAMP WITH TIME ZONE,
-        location_id BIGINT REFERENCES locations(id),
         created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- =========================
+-- Тренировки связанные с игроком
+-- =========================
+CREATE TABLE player_trainings (
+        id          BIGSERIAL PRIMARY KEY,
+        training_id BIGINT NOT NULL REFERENCES trainings(id) ON DELETE CASCADE,
+        player_id   BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+        note        VARCHAR(1023)
 );
 
 -- =========================
@@ -124,7 +128,7 @@ CREATE TABLE trainings (
 CREATE TABLE player_evaluations (
         id          BIGSERIAL PRIMARY KEY,
         player_id   BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
-        trainer_id  BIGINT NOT NULL REFERENCES users(id), -- тренер
+        trainer_id  BIGINT NOT NULL REFERENCES users(id),
         training_id BIGINT REFERENCES trainings(id),
         score       INT NOT NULL CHECK (score BETWEEN 1 AND 100),
         note        TEXT,
@@ -169,10 +173,12 @@ CREATE TABLE players_teams (
 -- Турниры
 -- =========================
 CREATE TABLE tournaments (
-        id          BIGSERIAL PRIMARY KEY,
-        name        VARCHAR(255) NOT NULL,
-        season_id   BIGINT REFERENCES seasons(id) ON DELETE SET NULL,
-        created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
+        id                      BIGSERIAL PRIMARY KEY,
+        name                    VARCHAR(255) NOT NULL,
+        season_id               BIGINT REFERENCES seasons(id) ON DELETE SET NULL,
+        tournament_start_date   TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        tournament_end_date     TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        created_at              TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- =========================
@@ -225,15 +231,15 @@ CREATE TABLE goals (
 );
 
 -- =========================
--- Магазин
+-- Магазин (только под админом добавление)
 -- =========================
 CREATE TABLE products (
         id          BIGSERIAL PRIMARY KEY,
-        name        VARCHAR(255) NOT NULL,
-        description TEXT,
+        name        VARCHAR(127) NOT NULL,
+        description VARCHAR(511),
         price       REAL NOT NULL CHECK (price >= 0),
         stock       INT DEFAULT 0 CHECK (stock >= 0),
-        image_path   TEXT,
+        image_path  TEXT,
         created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
@@ -247,4 +253,11 @@ CREATE TABLE purchases (
         quantity     INT NOT NULL CHECK (quantity > 0),
         total_price  REAL NOT NULL CHECK (total_price >= 0),
         purchased_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE refresh_tokens (
+        id           BIGSERIAL PRIMARY KEY,
+        user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token        VARCHAR(255) NOT NULL,
+        expiry_date  TIMESTAMP WITH TIME ZONE NOT NULL
 );
