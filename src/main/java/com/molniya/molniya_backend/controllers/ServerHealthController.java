@@ -17,4 +17,9 @@ public class ServerHealthController {
     public ResponseEntity<?> getServerHealth(){
         return ResponseEntity.ok("Molniya backend server is running correctly");
     }
+
+    @GetMapping(value = "/private")
+    public ResponseEntity<?> getServerHealth2(){
+        return ResponseEntity.ok("PRIVATE !!! Molniya backend server is running correctly");
+    }
 }

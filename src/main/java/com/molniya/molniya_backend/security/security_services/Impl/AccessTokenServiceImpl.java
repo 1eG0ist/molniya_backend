@@ -1,5 +1,7 @@
 package com.molniya.molniya_backend.security.security_services.Impl;
 
+import com.molniya.molniya_backend.models.Role;
+import com.molniya.molniya_backend.models.User;
 import com.molniya.molniya_backend.security.config.CustomUserDetails;
 import com.molniya.molniya_backend.security.security_services.AccessTokenService;
 import io.jsonwebtoken.Claims;
@@ -52,9 +54,26 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 .compact();
     }
 
-//    public String getUserEmail(String token) {
-//        return extractClaim(token, Claims::getSubject);
-//    }
+    @Override
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        List<String> roleList = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+        claims.put("roles", roleList);
+        claims.put("phone", user.getPhone());
+
+        Date issuedDate = new Date();
+        Date expiredDate = new Date(issuedDate.getTime() + lifetime.toMillis());
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getId().toString())
+                .setIssuedAt(issuedDate)
+                .setExpiration(expiredDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
 
     public String getUserId(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -63,8 +82,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     public List<String> getRoles(String token) {
         Claims claims = extractAllClaims(token);
         return claims.get("roles", List.class);
-        // mb better like this
-        //return objectMapper.convertValue(claims.get("roles"), new TypeReference<>(){});
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

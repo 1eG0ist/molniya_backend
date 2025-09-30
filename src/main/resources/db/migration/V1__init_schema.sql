@@ -3,11 +3,12 @@
 -- =========================
 CREATE TABLE roles (
         id          BIGSERIAL PRIMARY KEY,
-        name        VARCHAR(50) UNIQUE NOT NULL -- PLAYER, TRAINER, ADMIN
+        name        VARCHAR(50) UNIQUE NOT NULL -- USER, PLAYER, TRAINER, ADMIN
 );
 
-INSERT INTO roles (name) 
-VALUES ('PLAYER'), 
+INSERT INTO roles (name)
+VALUES ('USER'),
+       ('PLAYER'),
        ('TRAINER'),
        ('ADMIN');
 
@@ -259,5 +260,16 @@ CREATE TABLE refresh_tokens (
         id           BIGSERIAL PRIMARY KEY,
         user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         token        VARCHAR(255) NOT NULL,
-        expiry_date  TIMESTAMP WITH TIME ZONE NOT NULL
+        expiry_date  TIMESTAMP WITH TIME ZONE NOT NULL,
+        revoked      BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE verification_codes (
+        id                  BIGSERIAL PRIMARY KEY,
+        phone               VARCHAR(50) NOT NULL,
+        code                VARCHAR(10) NOT NULL,
+        verification_token  VARCHAR(255) NOT NULL,
+        created_at          TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        expires_at          TIMESTAMP WITH TIME ZONE NOT NULL,
+        used                BOOLEAN NOT NULL DEFAULT FALSE
 );
