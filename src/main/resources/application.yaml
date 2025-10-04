@@ -11,6 +11,11 @@ spring:
   application:
     name: molniya_backend
 
+  servlet:
+    multipart:
+      max-file-size: 300MB
+      max-request-size: 300MB
+
   datasource:
     url: jdbc:postgresql://localhost:5455/molniya_db
     username: postgres
@@ -41,3 +46,11 @@ management:
   endpoint:
     health:
       show-details: never # не палим детали локально
+
+file:
+  windows:
+    files-dir: "D:\\molniya_images\\"
+    files-sep: "\\"
+  linux:
+    files-dir: "~/molniya_images/"
+    files-sep: "/"
