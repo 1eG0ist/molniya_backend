@@ -16,6 +16,12 @@ spring:
       max-file-size: 300MB
       max-request-size: 300MB
 
+  data:
+    redis:
+      host: localhost   # обращаемся к Redis через прокинутый порт 6379, т.к. приложение запускается руками, а не в docker
+      port: 6379
+      timeout: 2000ms
+
   datasource:
     url: jdbc:postgresql://localhost:5455/molniya_db
     username: postgres

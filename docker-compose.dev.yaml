@@ -12,4 +12,11 @@ services:
     ports:
       - "5455:5432"
     volumes:
-      - ${DB_DATA_PATH:-~/molniya_db}:/var/lib/postgresql/data
+      - ${DB_DATA_PATH:-~/molniya_db}:/var/lib/postgresql/data # On windows store on like that C:\Users\username\molniya_db
+
+  redis:
+    image: redis:7.4
+    container_name: molniya-redis-dev
+    restart: always
+    ports:
+      - "6379:6379"

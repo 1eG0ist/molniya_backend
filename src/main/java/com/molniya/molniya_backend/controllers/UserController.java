@@ -5,19 +5,21 @@ import com.molniya.molniya_backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/users")
 public class UserController {
     final UserService userService;
 
-    @PatchMapping
+    @PatchMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateUser(
-            @RequestBody UpdateUserRequestDto user) {
+            @RequestPart("updatedDto") UpdateUserRequestDto updatedDto,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) {
         try {
-            return ResponseEntity.ok(userService.updateUser(userId, user));
+            return ResponseEntity.ok(userService.updateUser(updatedDto, photo));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

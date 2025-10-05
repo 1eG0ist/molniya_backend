@@ -1,17 +1,19 @@
 package com.molniya.molniya_backend.services.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.molniya.molniya_backend.dtos.auth.PhoneVerificationResponse;
-import com.molniya.molniya_backend.models.VerificationCode;
-import com.molniya.molniya_backend.repositories.VerificationCodeRepository;
+import com.molniya.molniya_backend.exceptions.access.InvalidVerificationTokenException;
+import com.molniya.molniya_backend.exceptions.bad_data.InvalidVerificationCodeException;
+import com.molniya.molniya_backend.exceptions.no_data.NotFoundDataException;
 import com.molniya.molniya_backend.services.VerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
+import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -19,32 +21,31 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService {
 
-    private final VerificationCodeRepository verificationCodeRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
+
+    private static final Duration EXPIRATION = Duration.ofMinutes(2);
 
     @Override
-    @Transactional
     public PhoneVerificationResponse sendVerificationCode(String phone) {
         String verificationToken = UUID.randomUUID().toString();
+        String code = "000000"; // Для разработки, можно генерацию рандомного кода добавить
 
-        // В реальном приложении здесь должна быть генерация случайного 6-значного кода
-        // Для разработки используем статический код 000000
-        String code = "000000";
+        // Создаем объект для хранения в Redis
+        Map<String, String> data = Map.of(
+                "code", code,
+                "verificationToken", verificationToken
+        );
 
-        OffsetDateTime now = OffsetDateTime.now();
-        OffsetDateTime expiresAt = now.plus(5, ChronoUnit.MINUTES); // Код действителен 5 минут
+        try {
+            String json = objectMapper.writeValueAsString(data);
+            redisTemplate.opsForValue().set(phone, json, EXPIRATION);
+        } catch (JsonProcessingException e) {
+            log.error("Ошибка сериализации кода верификации для телефона {}: {}", phone, e.getMessage());
+            throw new RuntimeException("Ошибка генерации кода верификации");
+        }
 
-        VerificationCode verificationCode = VerificationCode.builder()
-                .phone(phone)
-                .code(code)
-                .verificationToken(verificationToken)
-                .createdAt(now)
-                .expiresAt(expiresAt)
-                .used(false)
-                .build();
-
-        verificationCodeRepository.save(verificationCode);
-
-        // TODO ТУТ ЛОГИКУ ОТПРАВКИ НА ТЕЛЕФОН
+        // TODO ТУТ ЛОГИКУ ОТПРАВКИ НА ТЕЛЕФОН ВЫНЕСЕННУЮ В ОТДЕЛЬНЫЙ СЕРВИС
         log.info("Код верификации для телефона {}: {}", phone, code);
 
         return PhoneVerificationResponse.builder()
@@ -54,21 +55,30 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     @Override
-    @Transactional
-    public boolean verifyCode(String phone, String code, String verificationToken) {
-        Optional<VerificationCode> codeOpt = verificationCodeRepository.findActiveByPhoneAndToken(
-                phone, verificationToken, OffsetDateTime.now());
+    public void verifyCode(String phone, String code, String verificationToken) {
+        String json = redisTemplate.opsForValue().get(phone);
 
-        if (codeOpt.isPresent()) {
-            VerificationCode verificationCode = codeOpt.get();
-
-            if (verificationCode.getCode().equals(code)) {
-                // Удаялем и отвечаем положительным кодом
-                verificationCodeRepository.delete(verificationCode);
-                return true;
-            }
+        if (json == null) {
+            throw new NotFoundDataException("Запросов на верификацию с запрашиваемым телефоном не найдено или истекло время жизни кода");
         }
 
-        return false;
+        Map<String, String> data;
+        try {
+            data = objectMapper.readValue(json, Map.class);
+        } catch (JsonProcessingException e) {
+            log.error("Ошибка десериализации кода верификации для телефона {}: {}", phone, e.getMessage());
+            throw new RuntimeException("Ошибка проверки кода верификации");
+        }
+
+        if (!data.get("code").equals(code)) {
+            throw new InvalidVerificationCodeException();
+        }
+
+        if (!data.get("verificationToken").equals(verificationToken)) {
+            throw new InvalidVerificationTokenException();
+        }
+
+        // Удаляем запись после успешной проверки
+        redisTemplate.delete(phone);
     }
 }

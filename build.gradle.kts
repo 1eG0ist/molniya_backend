@@ -26,19 +26,25 @@ dependencies {
 
     // --- Flyway for DB migrations ---
     implementation("org.flywaydb:flyway-core")
+
     // поддержка PostgreSQL-specific миграций (например, типов)
     implementation("org.flywaydb:flyway-database-postgresql")
 
     // --- PostgreSQL driver ---
     runtimeOnly("org.postgresql:postgresql")
 
+    // --- Redis ---
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
     // --- JWT ---
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-    // --- Email ---
-    implementation("org.springframework.boot:spring-boot-starter-mail")
+    // --- Mappers ---
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
     // --- Dev & Tools ---
     compileOnly("org.projectlombok:lombok")

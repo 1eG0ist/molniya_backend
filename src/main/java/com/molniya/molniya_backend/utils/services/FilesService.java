@@ -1,13 +1,13 @@
-package com.molniya.molniya_backend.services;
+package com.molniya.molniya_backend.utils.services;
 
-import com.molniya.molniya_backend.enums.FileType;
+import com.molniya.molniya_backend.enums.FileGroup;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FilesService {
     /**
      * Сохраняет файл и возвращает путь к нему
      */
-    String saveFile(MultipartFile file, FileType type);
+    String saveFile(MultipartFile file, FileGroup type);
 
     /**
      * Удаляет файл по пути
@@ -28,4 +28,9 @@ public interface FilesService {
      * Генерирует уникальное имя файла
      */
     String generateUniqueFilename(String originalFilename);
+
+    /**
+     * Проверяет тип переданного файла
+     */
+    boolean isFileTypeSuitable(String[] allowedTypes, String fileName);
 }

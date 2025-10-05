@@ -2,6 +2,7 @@ package com.molniya.molniya_backend.services.impl;
 
 import com.molniya.molniya_backend.dtos.auth.JwtResponseDto;
 import com.molniya.molniya_backend.dtos.auth.PhoneVerificationResponse;
+import com.molniya.molniya_backend.mappers.UserMapper;
 import com.molniya.molniya_backend.models.RefreshToken;
 import com.molniya.molniya_backend.models.Role;
 import com.molniya.molniya_backend.models.User;
@@ -32,6 +33,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final VerificationService verificationService;
     private final RefreshTokenService refreshTokenService;
     private final AccessTokenService accessTokenService;
+    private final UserMapper userMapper;
 
     @Override
     public PhoneVerificationResponse sendVerificationCode(String phone) {
@@ -42,10 +44,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional
     public JwtResponseDto verifyCodeAndAuthenticate(String phone, String code, String verificationToken) {
         // Проверяем код верификации
-        boolean isCodeValid = verificationService.verifyCode(phone, code, verificationToken);
-        if (!isCodeValid) {
-            throw new BadCredentialsException("Неверный код верификации");
-        }
+        verificationService.verifyCode(phone, code, verificationToken);
 
         // Ищем пользователя по телефону или создаем нового
         Optional<User> userOpt = userRepository.findByPhone(phone);
@@ -65,7 +64,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         return JwtResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getToken())
-                .user(user)
+                .user(userMapper.toDto(user))
                 .newUser(isNewUser)
                 .build();
     }
@@ -88,7 +87,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                     return JwtResponseDto.builder()
                             .accessToken(accessToken)
                             .refreshToken(newRefreshToken.getToken())
-                            .user(user)
+                            .user(userMapper.toDto(user))
                             .newUser(false)
                             .build();
                 })

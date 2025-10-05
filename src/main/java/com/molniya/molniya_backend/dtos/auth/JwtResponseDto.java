@@ -1,6 +1,6 @@
 package com.molniya.molniya_backend.dtos.auth;
 
-import com.molniya.molniya_backend.models.User;
+import com.molniya.molniya_backend.dtos.user.UserResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class JwtResponseDto {
     private String accessToken;
     private String refreshToken;
-    private User user;
+    private UserResponseDto user;
     private boolean newUser;
 }

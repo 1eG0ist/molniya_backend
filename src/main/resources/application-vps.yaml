@@ -3,6 +3,10 @@ spring:
     activate:
       on-profile: vps
 
+  data:
+    redis:
+      host: redis   # обращаемся к Redis, т.к. приложение запускается в docker (vps версия)
+
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -22,11 +26,10 @@ management:
     health:
       show-details: always
 
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-
   tracing:
     sampling:
       probability: 0.1
+  prometheus:
+    metrics:
+      export:
+        enabled: true

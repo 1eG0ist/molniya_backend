@@ -3,7 +3,7 @@ package com.molniya.molniya_backend.enums;
 import lombok.Getter;
 
 @Getter
-public enum FileType {
+public enum FileGroup {
     USERPHOTO("users"),
     TRAININGPHOTO("trainings"),
     PROFUCTPHOTO("products"),
@@ -11,7 +11,7 @@ public enum FileType {
 
     private final String folderName;
 
-    FileType(String folderName) {
+    FileGroup(String folderName) {
         this.folderName = folderName;
     }
 }

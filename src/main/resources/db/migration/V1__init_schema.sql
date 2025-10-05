@@ -7,10 +7,10 @@ CREATE TABLE roles (
 );
 
 INSERT INTO roles (name)
-VALUES ('USER'),
-       ('PLAYER'),
-       ('TRAINER'),
-       ('ADMIN');
+VALUES ('ROLE_USER'),
+       ('ROLE_PLAYER'),
+       ('ROLE_TRAINER'),
+       ('ROLE_ADMIN');
 
 -- =========================
 -- Пользователи
@@ -262,14 +262,4 @@ CREATE TABLE refresh_tokens (
         token        VARCHAR(255) NOT NULL,
         expiry_date  TIMESTAMP WITH TIME ZONE NOT NULL,
         revoked      BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE TABLE verification_codes (
-        id                  BIGSERIAL PRIMARY KEY,
-        phone               VARCHAR(50) NOT NULL,
-        code                VARCHAR(10) NOT NULL,
-        verification_token  VARCHAR(255) NOT NULL,
-        created_at          TIMESTAMP WITH TIME ZONE DEFAULT now(),
-        expires_at          TIMESTAMP WITH TIME ZONE NOT NULL,
-        used                BOOLEAN NOT NULL DEFAULT FALSE
 );

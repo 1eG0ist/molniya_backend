@@ -1,7 +1,6 @@
 package com.molniya.molniya_backend.dtos.user;
 
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -12,5 +11,5 @@ public class UpdateUserRequestDto {
     private String fullName;
     private String email;
     private LocalDate birthday;
-    private MultipartFile photo;
+    private boolean isPhotoDeleted = false;
 }
